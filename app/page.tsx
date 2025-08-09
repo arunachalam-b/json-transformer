@@ -1,30 +1,32 @@
 "use client";
-import CodeEditor from '@uiw/react-textarea-code-editor';
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 export default function Home() {
-  const [code, setCode] = useState(
-    `function add(a, b) {\n  return a + b;\n}`
-  );
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const [editor, setEditor] = useState<any>(null);
+  const editorRef = useRef(null);
+
+  useEffect(() => {
+    if (editorRef && editorRef.current) {
+      const myEditor: monaco.editor.IStandaloneCodeEditor = monaco.editor.create(editorRef.current, {
+        value: "{\n\t\"key\": \"value\"\n}",
+        language: 'json',
+        theme: 'vs-dark',
+        autoIndent: 'full'
+      });
+      setEditor(myEditor)
+    }
+    return () => { editor.dispose() }
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [editorRef])
 
   return (
     <div className={styles.page}>
       <div className={styles.container}>
         <div className={styles.editor} style={{ width: '100%' }}>
-          <CodeEditor
-            value={code}
-            language="js"
-            placeholder="Please enter JS code."
-            onChange={(evn) => setCode(evn.target.value)}
-            padding={15}
-            style={{
-              backgroundColor: "#f5f5f5",
-              fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
-              height: '100%',
-              overflow: 'auto'
-            }}
-          />
+       <div ref={editorRef} style={{height: '95vh'}}></div>
         </div>
         <div className={styles.inputs}>
           <input type="text" placeholder="Input 1" className={styles.input} />
